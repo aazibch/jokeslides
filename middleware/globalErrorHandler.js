@@ -40,12 +40,12 @@ const sendError = (err, req, res) => {
 };
 
 module.exports = (err, req, res, next) => {
+    console.log('[globalErrorHandler] error', err);
     let errorObj = { ...err };
     errorObj.message = err.message;
 
     if (err.name === 'CastError') errorObj = getCastError(err);
     if (err.code === 11000) errorObj = getDublicateFieldError(err);
-
     if (err.name === 'ValidationError') errorObj = getValidationError(err);
 
     sendError(errorObj, req, res);
