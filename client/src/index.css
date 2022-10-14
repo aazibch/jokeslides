@@ -1,0 +1,18 @@
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+
+body {
+    font-family: 'Cutive Mono', monospace;
+    color: #333333;
+    margin: 0;
+}
+
+.text-muted {
+    opacity: 0.55;
+    /* color: red; */
+}

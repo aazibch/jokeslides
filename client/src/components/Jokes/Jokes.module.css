@@ -1,0 +1,28 @@
+.jokes {
+    margin-top: 4rem;
+}
+
+.jokesTop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.jokesBottom {
+    text-align: center;
+}
+
+.jokeCount {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.navButton {
+    height: 2.5rem;
+    width: 2.5rem;
+}
+
+.navButton svg {
+    font-size: 2rem;
+}

@@ -1,0 +1,16 @@
+.button {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid rgb(206, 206, 206);
+    border-radius: 0.3rem;
+    cursor: pointer;
+    background: #e9e9ed;
+}
+
+.button:hover {
+    background: #dfdfe2;
+}
+
+.button_large {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+}
