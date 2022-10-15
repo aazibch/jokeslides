@@ -14,47 +14,54 @@ import classes from './Jokes.module.css';
 const Jokes = () => {
     const jokesCtx = useContext(JokesContext);
 
-    return (
-        <div className={classes.jokes}>
-            {jokesCtx.loading ? (
-                <LoadingSpinner />
-            ) : (
-                <>
-                    <div className={classes.jokesTop}>
-                        <div className={classes.navButtonContainer}>
-                            {jokesCtx.openJoke.position > 1 && (
-                                <IconButton
-                                    onClick={jokesCtx.prevJokeHandler}
-                                    className={classes.navButton}
-                                >
-                                    <FontAwesomeIcon icon={faCaretLeft} />
-                                </IconButton>
-                            )}
-                        </div>
+    let content = '';
 
-                        <Joke />
-                        <div className={classes.navButtonContainer}>
-                            {jokesCtx.openJoke.position !==
-                                jokesCtx.jokesCount && (
-                                <IconButton
-                                    onClick={jokesCtx.nextJokeHandler}
-                                    className={classes.navButton}
-                                >
-                                    <FontAwesomeIcon icon={faCaretRight} />
-                                </IconButton>
-                            )}
-                        </div>
+    if (jokesCtx.loading)
+        content = (
+            <div className={classes.jokes}>
+                <LoadingSpinner />
+            </div>
+        );
+
+    if (!jokesCtx.loading && !jokesCtx.error)
+        content = (
+            <div className={classes.jokes}>
+                <div className={classes.jokesTop}>
+                    <div className={classes.navButtonContainer}>
+                        {jokesCtx.openJoke.position > 1 && (
+                            <IconButton
+                                onClick={jokesCtx.prevJokeHandler}
+                                className={classes.navButton}
+                            >
+                                <FontAwesomeIcon icon={faCaretLeft} />
+                            </IconButton>
+                        )}
                     </div>
-                    <div className={classes.jokesBottom}>
-                        <p className={`${classes.jokeCount} text-muted`}>
-                            {jokesCtx.openJoke.position} / {jokesCtx.jokesCount}
-                        </p>
-                        <Button size="large">Random</Button>
+
+                    <Joke />
+                    <div className={classes.navButtonContainer}>
+                        {jokesCtx.openJoke.position !== jokesCtx.jokesCount && (
+                            <IconButton
+                                onClick={jokesCtx.nextJokeHandler}
+                                className={classes.navButton}
+                            >
+                                <FontAwesomeIcon icon={faCaretRight} />
+                            </IconButton>
+                        )}
                     </div>
-                </>
-            )}
-        </div>
-    );
+                </div>
+                <div className={classes.jokesBottom}>
+                    <p className={`${classes.jokeCount} text-muted`}>
+                        {jokesCtx.openJoke.position} / {jokesCtx.jokesCount}
+                    </p>
+                    <Button onClick={jokesCtx.randomJokeHandler} size="large">
+                        Random Joke
+                    </Button>
+                </div>
+            </div>
+        );
+
+    return content;
 };
 
 export default Jokes;

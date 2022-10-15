@@ -6,9 +6,11 @@ const JokesContext = createContext({
     jokesCount: 0,
     openJoke: {},
     loading: true,
+    error: null,
     openNewJoke: (jokeId) => {},
     prevJokeHandler: () => {},
-    nextJokeHandler: () => {}
+    nextJokeHandler: () => {},
+    randomJokeHandler: () => {}
 });
 
 const formatJokes = (jokes) => {
@@ -24,18 +26,28 @@ export const JokesContextProvider = (props) => {
     const [loading, setLoading] = useState(true);
     const [jokes, setJokes] = useState(null);
     const [openJoke, setOpenJoke] = useState(null);
+    const [error, setError] = useState(null);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const getJokes = async () => {
-            const response = await axios.get('/api/v1/jokes/');
+            try {
+                const response = await axios.get('/api/v1/jokes/');
 
-            const jokes = formatJokes(response.data.data);
+                const jokes = formatJokes(response.data.data);
 
-            setJokes(jokes);
-            setOpenJoke({ ...jokes[0] });
-            setLoading(false);
+                setJokes(jokes);
+                setOpenJoke({ ...jokes[0] });
+                setLoading(false);
+            } catch (err) {
+                setLoading(false);
+                setError(
+                    err.response?.data.message
+                        ? err.response.data.message
+                        : err.message
+                );
+            }
         };
 
         getJokes();
@@ -63,13 +75,22 @@ export const JokesContextProvider = (props) => {
         navigate(`/${jokes[--jokeIndex]._id}`);
     };
 
+    const randomJokeHandler = () => {
+        const randomIndex = Math.floor(Math.random() * jokes.length);
+        const randomJoke = jokes[randomIndex];
+
+        navigate(`/${randomJoke._id}`);
+    };
+
     const context = {
         jokesCount: jokes?.length,
         openJoke: openJoke,
         loading: loading,
+        error: error,
         openNewJoke: openNewJoke,
         prevJokeHandler: prevJokeHandler,
-        nextJokeHandler: nextJokeHandler
+        nextJokeHandler: nextJokeHandler,
+        randomJokeHandler: randomJokeHandler
     };
 
     return (
