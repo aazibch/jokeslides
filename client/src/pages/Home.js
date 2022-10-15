@@ -16,9 +16,7 @@ const Home = () => {
         if (!loading && !error) {
             if (!id) {
                 navigate(`/${openJoke._id}`);
-            }
-
-            if (id !== openJoke._id) {
+            } else if (id !== openJoke._id) {
                 openNewJoke(id);
             }
         }

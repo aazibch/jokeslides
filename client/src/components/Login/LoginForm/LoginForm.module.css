@@ -1,0 +1,10 @@
+.loginForm {
+    padding: 2rem;
+    overflow: auto;
+    max-width: 30rem;
+    margin: 0 auto;
+}
+
+.loginButton {
+    float: right;
+}

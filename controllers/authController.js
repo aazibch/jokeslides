@@ -19,7 +19,8 @@ const createSendToken = (userId, req, res) => {
             Date.now() + process.env.JWT_COOKIE_EXPIRATION * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
-        secure: req.secure
+        secure: req.secure,
+        sameSite: 'Strict'
     });
 
     return token;
@@ -71,7 +72,7 @@ exports.login = catchAsync(async (req, res, next) => {
         );
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    let user = await User.findOne({ email }).select('+password');
 
     if (!user || !(await user.isPasswordCorrect(password, user.password))) {
         return next(new AppError('Incorrect email address or password.', 401));
@@ -79,13 +80,14 @@ exports.login = catchAsync(async (req, res, next) => {
 
     const token = createSendToken(user._id, req, res);
 
+    user = user.toObject();
+    delete user.password;
+
     res.status(200).json({
         status: 'success',
         message: 'You were logged in successfully.',
         token,
-        data: {
-            userId: user._id
-        }
+        data: user
     });
 });
 

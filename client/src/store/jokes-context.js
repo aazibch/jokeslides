@@ -60,6 +60,8 @@ export const JokesContextProvider = (props) => {
             setOpenJoke({
                 ...joke
             });
+        } else {
+            setError('The page you are looking for does not exist.');
         }
     };
 
