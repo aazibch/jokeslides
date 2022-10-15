@@ -1,15 +1,16 @@
+import { useContext } from 'react';
+
+import JokesContext from '../../../store/jokes-context';
+
 import classes from './Joke.module.css';
 
 const Joke = () => {
+    const jokesCtx = useContext(JokesContext);
+
     return (
         <div className={classes.joke}>
-            <div className={classes.content}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                Lacus vel facilisis volutpat est velit egestas dui id. Cursus
-                sit amet dictum sit.
-            </div>
-            <p className={classes.source}>Norm Macdonald</p>
+            <div className={classes.content}>{jokesCtx.openJoke.content}</div>
+            <p className={classes.source}>{jokesCtx.openJoke.source}</p>
         </div>
     );
 };

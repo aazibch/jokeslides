@@ -1,5 +1,6 @@
 .jokes {
-    margin-top: 4rem;
+    margin-top: 6rem;
+    margin-bottom: 6rem;
 }
 
 .jokesTop {
@@ -16,6 +17,14 @@
 .jokeCount {
     font-size: 1.25rem;
     margin-bottom: 1rem;
+}
+
+.navButtonContainer {
+    height: 3rem;
+    flex: 0 0 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .navButton {
