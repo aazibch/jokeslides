@@ -1,50 +1,48 @@
 import axios from 'axios';
-import { createContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext({
     loggedInUser: null,
-    error: null,
-    loading: false,
+    loadingUser: true,
     loginHandler: (data) => {},
-    dismissErrorHandler: () => {}
+    logoutHandler: () => {}
 });
 
 export const AuthContextProvider = (props) => {
     const [loggedInUser, setLoggedInUser] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [loadingUser, setLoadingUser] = useState(true);
 
-    const navigate = useNavigate();
+    useEffect(() => {
+        const getLoggedInUser = async () => {
+            try {
+                const response = await axios('/api/v1/users/current');
+
+                if (response.data.data) {
+                    setLoggedInUser(response.data.data);
+                }
+
+                setLoadingUser(false);
+            } catch (err) {
+                setLoadingUser(false);
+            }
+        };
+
+        getLoggedInUser();
+    }, []);
 
     const loginHandler = async (data) => {
-        try {
-            setLoading(true);
-            const response = await axios.post('/api/v1/users/login/', data);
-
-            setLoggedInUser(response.data.data);
-            navigate('/');
-            setLoading(false);
-        } catch (err) {
-            setLoading(false);
-            setError(
-                err.response?.data.message
-                    ? err.response.data.message
-                    : err.message
-            );
-        }
+        setLoggedInUser(data);
     };
 
-    const dismissErrorHandler = () => {
-        setError(null);
+    const logoutHandler = async () => {
+        setLoggedInUser(null);
     };
 
     const context = {
         loggedInUser: loggedInUser,
-        error: error,
-        loading: loading,
+        loadingUser: loadingUser,
         loginHandler: loginHandler,
-        dismissErrorHandler: dismissErrorHandler
+        logoutHandler: logoutHandler
     };
 
     return (

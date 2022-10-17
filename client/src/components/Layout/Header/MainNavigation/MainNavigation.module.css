@@ -1,0 +1,26 @@
+.mainNavigation a {
+    text-decoration: none;
+    color: inherit;
+    font-size: 1rem;
+    margin: 0 0.5rem;
+}
+
+.mainNavigation a:hover {
+    color: #727272;
+    text-decoration: underline;
+}
+
+.mainNavigation .active {
+    color: #727272;
+    text-decoration: underline;
+}
+
+.mainNavigation:hover .active {
+    color: inherit;
+    text-decoration: none;
+}
+
+.mainNavigation:hover .active:hover {
+    color: #727272;
+    text-decoration: underline;
+}

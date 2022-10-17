@@ -1,0 +1,15 @@
+.newJokeForm {
+    padding: 2rem;
+    overflow: auto;
+    max-width: 40rem;
+    margin: 0 auto;
+}
+
+.jokeInput textarea {
+    resize: none;
+    height: 10rem;
+}
+
+.createButton {
+    float: right;
+}

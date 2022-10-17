@@ -23,12 +23,20 @@ const Modal = (props) => {
                     </CardContent>
                     {props.dismissModalHandler && (
                         <CardFooter className={classes.footer}>
-                            <Button
-                                className={classes.closeButton}
-                                onClick={props.dismissModalHandler}
-                            >
-                                Close
-                            </Button>
+                            <div className={classes.actions}>
+                                <Button
+                                    className={classes.closeButton}
+                                    onClick={props.dismissModalHandler}
+                                >
+                                    Close
+                                </Button>
+
+                                {props.confirmModalHandler && (
+                                    <Button onClick={props.confirmModalHandler}>
+                                        Confirm
+                                    </Button>
+                                )}
+                            </div>
                         </CardFooter>
                     )}
                 </Card>,

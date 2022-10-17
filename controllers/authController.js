@@ -91,6 +91,24 @@ exports.login = catchAsync(async (req, res, next) => {
     });
 });
 
+exports.logout = (req, res, next) => {
+    sendLogoutCookie(res);
+    res.status(200).json({ status: 'success' });
+};
+
+exports.getLoggedInUser = (req, res, next) => {
+    if (req.user) {
+        res.status(200).json({
+            status: 'success',
+            data: req.user
+        });
+    } else {
+        res.status(200).json({
+            status: 'success'
+        });
+    }
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
     let token;
 
@@ -130,10 +148,43 @@ exports.protect = catchAsync(async (req, res, next) => {
     next();
 });
 
-exports.logout = (req, res, next) => {
-    sendLogoutCookie(res);
-    res.status(200).json({ status: 'success' });
-};
+exports.checkUserIsLoggedIn = catchAsync(async (req, res, next) => {
+    let token;
+
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
+    ) {
+        token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt) {
+        token = req.cookies.jwt;
+    }
+
+    if (!token) return next();
+
+    try {
+        token = req.cookies.jwt;
+
+        // 1) Verify token
+        const decoded = await promisify(jwt.verify)(
+            token,
+            process.env.JWT_SECRET
+        );
+
+        // 2) Checking if user still exists.
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            return next();
+        }
+
+        // There is a logged in user
+        req.user = user;
+        return next();
+    } catch (err) {
+        return next();
+    }
+});
 
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
