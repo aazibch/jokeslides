@@ -40,7 +40,6 @@ export const JokesContextProvider = (props) => {
         try {
             setLoading(true);
             const response = await axios.get('/api/v1/jokes/');
-
             const jokes = formatJokes(response.data.data);
 
             setJokes(jokes);
