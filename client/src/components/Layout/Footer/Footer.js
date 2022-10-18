@@ -7,10 +7,14 @@ function Footer() {
 
     return (
         <footer className={classes.footer}>
-            <p>
-                Coded by{' '}
-                <a href="https://github.com/aazibch/">Aazib Chaudhry</a>.
-            </p>
+            <div>
+                <p>
+                    Coded by{' '}
+                    <a href="https://github.com/aazibch/">Aazib Chaudhry</a>.
+                </p>
+                <p>In tribute to Norm Macdonald.</p>
+            </div>
+
             {authCtx.loggedInUser && (
                 <p className={classes.loggedIn}>
                     Logged in as{' '}
