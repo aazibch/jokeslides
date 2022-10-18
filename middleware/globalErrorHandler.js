@@ -40,7 +40,6 @@ const sendError = (err, req, res) => {
 };
 
 module.exports = (err, req, res, next) => {
-    console.log('[globalErrorHandler] error', err);
     let errorObj = { ...err };
     errorObj.message = err.message;
 

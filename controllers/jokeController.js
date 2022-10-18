@@ -3,7 +3,7 @@ const filterObject = require('../utils/filterObject');
 const Joke = require('../models/jokeModel');
 
 exports.getAllJokes = catchAsync(async (req, res, next) => {
-    const jokes = await Joke.find().sort('-dateAdded');
+    const jokes = await Joke.find();
 
     res.status(200).json({
         status: 'success',

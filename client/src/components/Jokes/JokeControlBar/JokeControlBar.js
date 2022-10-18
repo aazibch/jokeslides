@@ -17,7 +17,6 @@ const JokeControlBar = (props) => {
     const navigate = useNavigate();
 
     const deleteButtonHandler = () => {
-        console.log('deleteButtonHandler');
         setShowDeleteModal(true);
     };
 

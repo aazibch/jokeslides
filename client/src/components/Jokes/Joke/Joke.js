@@ -10,7 +10,9 @@ const Joke = () => {
     return (
         <div className={classes.joke}>
             <div className={classes.content}>{jokesCtx.openJoke.content}</div>
-            <p className={classes.source}>{jokesCtx.openJoke.source}</p>
+            {jokesCtx.openJoke.source && (
+                <p className={classes.source}>{jokesCtx.openJoke.source}</p>
+            )}
         </div>
     );
 };

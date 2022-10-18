@@ -8,15 +8,15 @@ const MainNavigation = () => {
     const jokesCtx = useContext(JokesContext);
     const location = useLocation();
 
-    const splitPathname = location.pathname.split('/');
-
     const assignClassNameForHome = (navData) => {
+        const splitPathname = location.pathname.split('/');
+
         if (
-            (navData.isActive &&
-                !jokesCtx.loading &&
-                !jokesCtx.error &&
-                location.pathname !== '/create-new-joke') ||
-            (splitPathname[2] && splitPathname[2] !== '/edit')
+            navData.isActive &&
+            !jokesCtx.loading &&
+            !jokesCtx.error &&
+            splitPathname.length < 3 &&
+            splitPathname[1] !== 'create-new-joke'
         ) {
             return classes.active;
         }

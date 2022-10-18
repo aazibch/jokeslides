@@ -25,8 +25,6 @@ const formatJokes = (jokes) => {
         return { ...joke, position: ++count };
     });
 
-    console.log('[formatJokes] updatedJokes', updatedJokes);
-
     return updatedJokes;
 };
 
@@ -46,7 +44,9 @@ export const JokesContextProvider = (props) => {
             const jokes = formatJokes(response.data.data);
 
             setJokes(jokes);
-            setOpenJoke({ ...jokes[0] });
+            if (jokes.length > 0) {
+                setOpenJoke({ ...jokes[0] });
+            }
             setLoading(false);
         } catch (err) {
             setLoading(false);
@@ -105,13 +105,17 @@ export const JokesContextProvider = (props) => {
     };
 
     const deleteJokeHandler = (id) => {
-        setJokes((prevJokes) => prevJokes.filter((joke) => joke._id !== id));
+        setJokes((prevJokes) => {
+            let updatedJokes = prevJokes.filter((joke) => joke._id !== id);
+            updatedJokes = formatJokes(updatedJokes);
+
+            return updatedJokes;
+        });
         setOpenJoke(null);
     };
 
     const nextJokeHandler = () => {
         let jokeIndex = jokes.findIndex((joke) => joke._id === openJoke._id);
-        console.log('jokeIndex', jokeIndex);
 
         navigate(`/${jokes[++jokeIndex]._id}`);
     };

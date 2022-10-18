@@ -7,6 +7,7 @@ import Jokes from '../../components/Jokes/Jokes';
 import Modal from '../../components/UI/Modal/Modal';
 import PageOffsetContainer from '../../components/UI/PageOffsetContainer/PageOffsetContainer';
 import LoadingSpinner from '../../components/UI/LoadingSpinner/LoadingSpinner';
+import AppMessage from '../../components/UI/AppMessage/AppMessage';
 
 const Home = () => {
     const [isLoading, setIsLoading] = useState();
@@ -30,7 +31,7 @@ const Home = () => {
                 openNewJoke(id);
             }
 
-            if (!id) {
+            if (!id && jokes.length > 0) {
                 navigate(`/${jokes[0]._id}`);
             }
         }
@@ -67,6 +68,9 @@ const Home = () => {
             {(jokesCtx.loading || isLoading) && <LoadingSpinner />}
             {jokesCtx.openJoke && !jokesCtx.error && !isLoading && (
                 <Jokes deleteJoke={deleteJoke} />
+            )}
+            {!loading && jokes && jokes.length === 0 && !error && (
+                <AppMessage message="No jokes found. Contact the (lazy-ass) admin of the site." />
             )}
         </PageOffsetContainer>
     );
