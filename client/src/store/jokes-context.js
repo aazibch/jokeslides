@@ -14,7 +14,9 @@ const JokesContext = createContext({
     randomJokeHandler: () => {},
     getAllJokesHandler: () => {},
     newJokeHandler: (data) => {},
-    deleteJokeHandler: (id) => {}
+    deleteJokeHandler: (id) => {},
+    editJokeHandler: (data) => {},
+    findJokeHelper: (id) => {}
 });
 
 const formatJokes = (jokes) => {
@@ -82,6 +84,26 @@ export const JokesContextProvider = (props) => {
         navigate(`/${data._id}`);
     };
 
+    const editJokeHandler = (data) => {
+        setJokes((prevJokes) => {
+            if (prevJokes) {
+                let updatedJokes = prevJokes.map((joke) => {
+                    if (joke._id === data._id) {
+                        return data;
+                    }
+
+                    return joke;
+                });
+
+                updatedJokes = formatJokes(updatedJokes);
+                return updatedJokes;
+            }
+
+            return null;
+        });
+        setOpenJoke(null);
+    };
+
     const deleteJokeHandler = (id) => {
         setJokes((prevJokes) => prevJokes.filter((joke) => joke._id !== id));
         setOpenJoke(null);
@@ -107,6 +129,12 @@ export const JokesContextProvider = (props) => {
         navigate(`/${randomJoke._id}`);
     };
 
+    const findJokeHelper = (id) => {
+        const joke = jokes.find((joke) => joke._id === id);
+
+        return joke;
+    };
+
     const context = {
         jokes: jokes,
         jokesCount: jokes?.length,
@@ -119,7 +147,9 @@ export const JokesContextProvider = (props) => {
         randomJokeHandler: randomJokeHandler,
         getAllJokesHandler: getAllJokesHandler,
         newJokeHandler: newJokeHandler,
-        deleteJokeHandler: deleteJokeHandler
+        deleteJokeHandler: deleteJokeHandler,
+        editJokeHandler: editJokeHandler,
+        findJokeHelper: findJokeHelper
     };
 
     return (

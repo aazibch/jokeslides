@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import axios from 'axios';
-import NewJokeForm from '../../components/Jokes/NewJokeForm/NewJokeForm';
+import CreateEditJokeForm from '../../components/Jokes/CreateEditJokeForm/CreateEditJokeForm';
 import LoadingSpinner from '../../components/UI/LoadingSpinner/LoadingSpinner';
 import Modal from '../../components/UI/Modal/Modal';
 import PageOffsetContainer from '../../components/UI/PageOffsetContainer/PageOffsetContainer';
@@ -45,13 +45,24 @@ const CreateNewJoke = () => {
         setSourceInput(event.target.value);
     };
 
+    const dismissErrorModalHandler = () => {
+        setError(null);
+    };
+
     return (
         <PageOffsetContainer>
-            {error && <Modal title="Error" content={error} />}
+            {error && (
+                <Modal
+                    title="Error"
+                    content={error}
+                    dismissModalHandler={dismissErrorModalHandler}
+                />
+            )}
             {loading ? (
                 <LoadingSpinner />
             ) : (
-                <NewJokeForm
+                <CreateEditJokeForm
+                    heading="Create New Joke"
                     jokeInput={jokeInput}
                     sourceInput={sourceInput}
                     jokeChangeHandler={jokeChangeHandler}
@@ -62,5 +73,8 @@ const CreateNewJoke = () => {
         </PageOffsetContainer>
     );
 };
+
+//@todo
+// Add handler to cancel error model.
 
 export default CreateNewJoke;

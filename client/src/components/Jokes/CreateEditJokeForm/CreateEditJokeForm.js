@@ -2,12 +2,13 @@ import Button from '../../UI/Button/Button';
 import Card from '../../UI/Card/Card';
 import Input from '../../UI/Input/Input';
 
-import classes from './NewJokeForm.module.css';
+import classes from './CreateEditJokeForm.module.css';
 
-const NewJokeForm = (props) => {
+const CreateEditJokeForm = (props) => {
     return (
-        <Card className={classes.newJokeForm}>
+        <Card className={classes.createEditJokeForm}>
             <form onSubmit={props.submitFormHandler}>
+                <h2>{props.heading}</h2>
                 <Input
                     id="joke"
                     className={classes.jokeInput}
@@ -29,4 +30,4 @@ const NewJokeForm = (props) => {
     );
 };
 
-export default NewJokeForm;
+export default CreateEditJokeForm;

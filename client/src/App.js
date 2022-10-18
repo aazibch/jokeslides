@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home/Home';
 import Login from './pages/Login/Login';
 import CreateNewJoke from './pages/CreateNewJoke/CreateNewJoke';
+import EditJoke from './pages/EditJoke/EditJoke';
 import Logout from './pages/Logout/Logout';
 import Layout from './components/Layout/Layout';
 import LoadingSpinner from './components/UI/LoadingSpinner/LoadingSpinner';
@@ -36,6 +37,7 @@ function App() {
                                 path="create-new-joke"
                                 element={<CreateNewJoke />}
                             />
+                            <Route path="/:id/edit" element={<EditJoke />} />
                         </>
                     )}
                     <Route

@@ -1,4 +1,5 @@
 import { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Button from '../../UI/Button/Button';
 import Modal from '../../UI/Modal/Modal';
@@ -13,6 +14,8 @@ const JokeControlBar = (props) => {
     const jokesCtx = useContext(JokesContext);
     const authCtx = useContext(AuthContext);
 
+    const navigate = useNavigate();
+
     const deleteButtonHandler = () => {
         console.log('deleteButtonHandler');
         setShowDeleteModal(true);
@@ -25,6 +28,10 @@ const JokeControlBar = (props) => {
     const confirmDeleteModalHandler = () => {
         setShowDeleteModal(false);
         props.deleteJoke();
+    };
+
+    const editButtonHandler = () => {
+        navigate(`/${jokesCtx.openJoke._id}/edit`);
     };
 
     return (
@@ -43,7 +50,9 @@ const JokeControlBar = (props) => {
                 </Button>
                 {authCtx.loggedInUser && (
                     <>
-                        <Button size="large">Edit</Button>
+                        <Button size="large" onClick={editButtonHandler}>
+                            Edit
+                        </Button>
                         <Button size="large" onClick={deleteButtonHandler}>
                             Delete
                         </Button>
