@@ -29,11 +29,10 @@ const createSendToken = (userId, req, res) => {
 const sendLogoutCookie = (res) => {
     res.cookie('jwt', '', {
         expires: new Date(Date.now() + 1000),
-        httpOnly: true
+        httpOnly: true,
+        sameSite: 'Strict'
     });
 };
-
-exports.sendLogoutCookie = sendLogoutCookie;
 
 exports.signup = catchAsync(async (req, res, next) => {
     const filteredBody = filterObject(
