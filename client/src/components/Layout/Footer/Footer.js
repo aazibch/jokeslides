@@ -8,11 +8,11 @@ function Footer() {
     return (
         <footer className={classes.footer}>
             <div>
+                <p>In tribute to Norm Macdonald.</p>
                 <p>
                     Coded by{' '}
                     <a href="https://github.com/aazibch/">Aazib Chaudhry</a>.
                 </p>
-                <p>In tribute to Norm Macdonald.</p>
             </div>
 
             {authCtx.loggedInUser && (
