@@ -7,6 +7,7 @@ const app = express();
 
 const jokeRoutes = require('./routes/jokeRoutes');
 const userRoutes = require('./routes/userRoutes');
+const AppError = require('./utils/AppError');
 const globalErrorHandler = require('./middleware/globalErrorHandler');
 
 app.use(express.json({ limit: '10kb' }));
@@ -18,6 +19,9 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/api/v1/jokes/', jokeRoutes);
 app.use('/api/v1/users/', userRoutes);
+app.all('*', (req, res, next) => {
+    next(new AppError('Route not found.', 404));
+});
 app.use(globalErrorHandler);
 
 if (process.env.NODE_ENV === 'production') {

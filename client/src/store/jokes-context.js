@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { createContext, useState } from 'react';
+import { createContext, useReducer } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const JokesContext = createContext({
     jokes: null,
     jokesCount: 0,
     openJoke: {},
-    loading: true,
+    loading: false,
     error: null,
     openNewJoke: (jokeId) => {},
     prevJokeHandler: () => {},
@@ -28,122 +28,195 @@ const formatJokes = (jokes) => {
     return updatedJokes;
 };
 
+const defaultJokesState = {
+    loading: false,
+    jokes: null,
+    openJoke: null,
+    error: null
+};
+
+const jokesReducer = (state, action) => {
+    if (action.type === 'SET_LOADING') {
+        return {
+            ...state,
+            loading: action.value
+        };
+    }
+
+    if (action.type === 'SET_ALL_JOKES') {
+        let jokes = state.jokes;
+        let openJoke = state.openJoke;
+
+        if (action.jokes.length > 0) {
+            jokes = formatJokes(action.jokes);
+            openJoke = { ...jokes[0] };
+        }
+
+        return {
+            ...state,
+            jokes,
+            openJoke,
+            loading: false
+        };
+    }
+
+    if (action.type === 'SET_ERROR') {
+        return {
+            ...state,
+            error: action.error,
+            loading: false
+        };
+    }
+
+    if (action.type === 'SET_OPEN_JOKE') {
+        return {
+            ...state,
+            openJoke: action.openJoke
+        };
+    }
+
+    if (action.type === 'ADD_NEW_JOKE') {
+        if (!state.jokes) return state;
+
+        let updatedJokes = [...state.jokes, action.newJoke];
+        updatedJokes = formatJokes(updatedJokes);
+
+        return {
+            ...state,
+            jokes: updatedJokes
+        };
+    }
+
+    if (action.type === 'UPDATE_JOKE') {
+        if (!state.jokes) return state;
+
+        const existingJokeIndex = state.jokes.findIndex(
+            (joke) => joke._id === action.updatedJoke._id
+        );
+
+        const updatedJoke = {
+            ...action.updatedJoke
+        };
+
+        let updatedJokes = [...state.jokes];
+        updatedJokes[existingJokeIndex] = updatedJoke;
+
+        updatedJokes = formatJokes(updatedJokes);
+
+        return {
+            jokes: updatedJokes
+        };
+    }
+
+    if (action.type === 'DELETE_JOKE') {
+        let updatedJokes = state.jokes.filter(
+            (joke) => joke._id !== action.jokeId
+        );
+        updatedJokes = formatJokes(updatedJokes);
+
+        return {
+            ...state,
+            jokes: updatedJokes,
+            openJoke: null
+        };
+    }
+
+    return defaultJokesState;
+};
+
 export const JokesContextProvider = (props) => {
-    const [loading, setLoading] = useState(false);
-    const [jokes, setJokes] = useState(null);
-    const [openJoke, setOpenJoke] = useState(null);
-    const [error, setError] = useState(null);
+    const [jokesState, dispatchJokesAction] = useReducer(
+        jokesReducer,
+        defaultJokesState
+    );
 
     const navigate = useNavigate();
 
     const getAllJokesHandler = async () => {
         try {
-            setLoading(true);
-            const response = await axios.get('/api/v1/jokes/');
-            const jokes = formatJokes(response.data.data);
+            dispatchJokesAction({ type: 'SET_LOADING', value: true });
 
-            setJokes(jokes);
-            if (jokes.length > 0) {
-                setOpenJoke({ ...jokes[0] });
-            }
-            setLoading(false);
+            const response = await axios.get('/api/v1/jokes/');
+
+            dispatchJokesAction({
+                type: 'SET_ALL_JOKES',
+                jokes: response.data.data
+            });
         } catch (err) {
-            setLoading(false);
-            setError(
-                err.response?.data.message
+            dispatchJokesAction({
+                type: 'SET_ERROR',
+                error: err.response?.data.message
                     ? err.response.data.message
                     : err.message
-            );
+            });
         }
     };
 
     const openNewJoke = (jokeId) => {
-        const joke = jokes.find((joke) => joke._id === jokeId);
+        const joke = jokesState.jokes.find((joke) => joke._id === jokeId);
 
         if (joke) {
-            setOpenJoke({
-                ...joke
+            dispatchJokesAction({
+                type: 'SET_OPEN_JOKE',
+                openJoke: { ...joke }
             });
         } else {
-            setError('The page you are looking for does not exist.');
+            dispatchJokesAction({
+                type: 'SET_ERROR',
+                error: 'The page you are looking for does not exist.'
+            });
         }
     };
 
     const newJokeHandler = (data) => {
-        setJokes((prevJokes) => {
-            if (prevJokes) {
-                let jokes = [...prevJokes, data];
-                jokes = formatJokes(jokes);
-                return jokes;
-            }
-
-            return null;
-        });
+        dispatchJokesAction({ type: 'ADD_NEW_JOKE', newJoke: data });
 
         navigate(`/${data._id}`);
     };
 
     const editJokeHandler = (data) => {
-        setJokes((prevJokes) => {
-            if (prevJokes) {
-                let updatedJokes = prevJokes.map((joke) => {
-                    if (joke._id === data._id) {
-                        return data;
-                    }
-
-                    return joke;
-                });
-
-                updatedJokes = formatJokes(updatedJokes);
-                return updatedJokes;
-            }
-
-            return null;
-        });
-        setOpenJoke(null);
+        dispatchJokesAction({ type: 'UPDATE_JOKE', updatedJoke: data });
     };
 
     const deleteJokeHandler = (id) => {
-        setJokes((prevJokes) => {
-            let updatedJokes = prevJokes.filter((joke) => joke._id !== id);
-            updatedJokes = formatJokes(updatedJokes);
-
-            return updatedJokes;
-        });
-        setOpenJoke(null);
+        dispatchJokesAction({ type: 'DELETE_JOKE', jokeId: id });
     };
 
     const nextJokeHandler = () => {
-        let jokeIndex = jokes.findIndex((joke) => joke._id === openJoke._id);
+        let jokeIndex = jokesState.jokes.findIndex(
+            (joke) => joke._id === jokesState.openJoke._id
+        );
 
-        navigate(`/${jokes[++jokeIndex]._id}`);
+        navigate(`/${jokesState.jokes[++jokeIndex]._id}`);
     };
 
     const prevJokeHandler = () => {
-        let jokeIndex = jokes.findIndex((joke) => joke._id === openJoke._id);
+        let jokeIndex = jokesState.jokes.findIndex(
+            (joke) => joke._id === jokesState.openJoke._id
+        );
 
-        navigate(`/${jokes[--jokeIndex]._id}`);
+        navigate(`/${jokesState.jokes[--jokeIndex]._id}`);
     };
 
     const randomJokeHandler = () => {
-        const randomIndex = Math.floor(Math.random() * jokes.length);
-        const randomJoke = jokes[randomIndex];
+        const randomIndex = Math.floor(Math.random() * jokesState.jokes.length);
+        const randomJoke = jokesState.jokes[randomIndex];
 
         navigate(`/${randomJoke._id}`);
     };
 
     const findJokeHelper = (id) => {
-        const joke = jokes.find((joke) => joke._id === id);
+        const joke = jokesState.jokes.find((joke) => joke._id === id);
 
         return joke;
     };
 
     const context = {
-        jokes: jokes,
-        jokesCount: jokes?.length,
-        openJoke: openJoke,
-        loading: loading,
-        error: error,
+        jokes: jokesState.jokes,
+        jokesCount: jokesState.jokes?.length,
+        openJoke: jokesState.openJoke,
+        loading: jokesState.loading,
+        error: jokesState.error,
         openNewJoke: openNewJoke,
         prevJokeHandler: prevJokeHandler,
         nextJokeHandler: nextJokeHandler,
