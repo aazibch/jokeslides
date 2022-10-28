@@ -19,12 +19,13 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/api/v1/jokes/', jokeRoutes);
 app.use('/api/v1/users/', userRoutes);
-app.all('*', (req, res, next) => {
+app.all('/api/v1/*', (req, res, next) => {
     next(new AppError('Route not found.', 404));
 });
 app.use(globalErrorHandler);
 
 if (process.env.NODE_ENV === 'production') {
+    console.log('production');
     app.use(express.static(path.join(__dirname, 'client/build')));
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, 'client/build/index.html'));
