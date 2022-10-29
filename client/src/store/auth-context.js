@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useReducer } from 'react';
 
 const AuthContext = createContext({
     loggedInUser: null,
@@ -8,9 +8,35 @@ const AuthContext = createContext({
     logoutHandler: () => {}
 });
 
+const defaultAuthState = {
+    loggedInUser: null,
+    loadingUser: true
+};
+
+const authReducer = (state, action) => {
+    if (action.type === 'SET_USER') {
+        return {
+            ...state,
+            loggedInUser: action.user,
+            loadingUser: false
+        };
+    }
+
+    if (action.type === 'SET_LOADING_USER') {
+        return {
+            ...state,
+            loadingUser: action.value
+        };
+    }
+
+    return defaultAuthState;
+};
+
 export const AuthContextProvider = (props) => {
-    const [loggedInUser, setLoggedInUser] = useState(null);
-    const [loadingUser, setLoadingUser] = useState(true);
+    const [authState, dispatchAuthAction] = useReducer(
+        authReducer,
+        defaultAuthState
+    );
 
     useEffect(() => {
         const getLoggedInUser = async () => {
@@ -18,12 +44,15 @@ export const AuthContextProvider = (props) => {
                 const response = await axios('/api/v1/users/current');
 
                 if (response.data.data) {
-                    setLoggedInUser(response.data.data);
+                    dispatchAuthAction({
+                        type: 'SET_USER',
+                        user: response.data.data
+                    });
                 }
 
-                setLoadingUser(false);
+                dispatchAuthAction({ type: 'SET_LOADING_USER', value: false });
             } catch (err) {
-                setLoadingUser(false);
+                dispatchAuthAction({ type: 'SET_LOADING_USER', value: false });
             }
         };
 
@@ -31,16 +60,16 @@ export const AuthContextProvider = (props) => {
     }, []);
 
     const loginHandler = async (data) => {
-        setLoggedInUser(data);
+        dispatchAuthAction({ type: 'SET_USER', user: data });
     };
 
     const logoutHandler = async () => {
-        setLoggedInUser(null);
+        dispatchAuthAction({ type: 'SET_USER', user: null });
     };
 
     const context = {
-        loggedInUser: loggedInUser,
-        loadingUser: loadingUser,
+        loggedInUser: authState.loggedInUser,
+        loadingUser: authState.loadingUser,
         loginHandler: loginHandler,
         logoutHandler: logoutHandler
     };
