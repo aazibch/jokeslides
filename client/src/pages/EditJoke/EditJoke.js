@@ -24,8 +24,8 @@ const EditPage = () => {
         jokes,
         loading,
         error,
-        openNewJoke,
         getAllJokesHandler,
+        openNewJoke,
         findJokeHelper
     } = jokesCtx;
     const { id } = useParams();

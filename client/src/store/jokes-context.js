@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createContext, useReducer } from 'react';
+import { createContext, useReducer, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const JokesContext = createContext({
@@ -132,7 +132,7 @@ export const JokesContextProvider = (props) => {
 
     const navigate = useNavigate();
 
-    const getAllJokesHandler = async () => {
+    const getAllJokesHandler = useCallback(async () => {
         try {
             dispatchJokesAction({ type: 'SET_LOADING', value: true });
 
@@ -150,23 +150,26 @@ export const JokesContextProvider = (props) => {
                     : err.message
             });
         }
-    };
+    }, []);
 
-    const openNewJoke = (jokeId) => {
-        const joke = jokesState.jokes.find((joke) => joke._id === jokeId);
+    const openNewJoke = useCallback(
+        (jokeId) => {
+            const joke = jokesState.jokes.find((joke) => joke._id === jokeId);
 
-        if (joke) {
-            dispatchJokesAction({
-                type: 'SET_OPEN_JOKE',
-                openJoke: { ...joke }
-            });
-        } else {
-            dispatchJokesAction({
-                type: 'SET_ERROR',
-                error: 'The page you are looking for does not exist.'
-            });
-        }
-    };
+            if (joke) {
+                dispatchJokesAction({
+                    type: 'SET_OPEN_JOKE',
+                    openJoke: { ...joke }
+                });
+            } else {
+                dispatchJokesAction({
+                    type: 'SET_ERROR',
+                    error: 'The page you are looking for does not exist.'
+                });
+            }
+        },
+        [jokesState.jokes]
+    );
 
     const newJokeHandler = (data) => {
         dispatchJokesAction({ type: 'ADD_NEW_JOKE', newJoke: data });
@@ -205,11 +208,14 @@ export const JokesContextProvider = (props) => {
         navigate(`/${randomJoke._id}`);
     };
 
-    const findJokeHelper = (id) => {
-        const joke = jokesState.jokes.find((joke) => joke._id === id);
+    const findJokeHelper = useCallback(
+        (id) => {
+            const joke = jokesState.jokes.find((joke) => joke._id === id);
 
-        return joke;
-    };
+            return joke;
+        },
+        [jokesState.jokes]
+    );
 
     const context = {
         jokes: jokesState.jokes,

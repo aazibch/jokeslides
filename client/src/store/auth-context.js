@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createContext, useEffect, useReducer } from 'react';
+import { createContext, useCallback, useEffect, useReducer } from 'react';
 
 const AuthContext = createContext({
     loggedInUser: null,
@@ -63,9 +63,9 @@ export const AuthContextProvider = (props) => {
         dispatchAuthAction({ type: 'SET_USER', user: data });
     };
 
-    const logoutHandler = async () => {
+    const logoutHandler = useCallback(async () => {
         dispatchAuthAction({ type: 'SET_USER', user: null });
-    };
+    }, []);
 
     const context = {
         loggedInUser: authState.loggedInUser,
