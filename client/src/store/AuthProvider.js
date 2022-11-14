@@ -1,26 +1,17 @@
-import axios from 'axios';
+import useHttp from '../hooks/useHttp';
 import { useCallback, useEffect, useReducer } from 'react';
 
 import AuthContext from './auth-context';
 
 const defaultAuthState = {
-    loggedInUser: null,
-    loadingUser: true
+    loggedInUser: null
 };
 
 const authReducer = (state, action) => {
     if (action.type === 'SET_USER') {
         return {
             ...state,
-            loggedInUser: action.user,
-            loadingUser: false
-        };
-    }
-
-    if (action.type === 'SET_LOADING_USER') {
-        return {
-            ...state,
-            loadingUser: action.value
+            loggedInUser: action.user
         };
     }
 
@@ -33,26 +24,22 @@ export const AuthProvider = (props) => {
         defaultAuthState
     );
 
+    const { sendRequest, isLoading: loadingUser } = useHttp();
+
     useEffect(() => {
         const getLoggedInUser = async () => {
-            try {
-                const response = await axios('/api/v1/users/current');
-
-                if (response.data.data) {
+            sendRequest({ url: '/api/v1/users/current' }, (response) => {
+                if (response.data) {
                     dispatchAuthAction({
                         type: 'SET_USER',
-                        user: response.data.data
+                        user: response.data
                     });
                 }
-
-                dispatchAuthAction({ type: 'SET_LOADING_USER', value: false });
-            } catch (err) {
-                dispatchAuthAction({ type: 'SET_LOADING_USER', value: false });
-            }
+            });
         };
 
         getLoggedInUser();
-    }, []);
+    }, [sendRequest]);
 
     const loginHandler = async (data) => {
         dispatchAuthAction({ type: 'SET_USER', user: data });
@@ -64,7 +51,7 @@ export const AuthProvider = (props) => {
 
     const context = {
         loggedInUser: authState.loggedInUser,
-        loadingUser: authState.loadingUser,
+        loadingUser: loadingUser,
         loginHandler: loginHandler,
         logoutHandler: logoutHandler
     };

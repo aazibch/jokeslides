@@ -4,7 +4,7 @@ const useHttp = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const sendRequest = useCallback(async (requestConfig, applyData) => {
+    const sendRequest = useCallback(async (requestConfig, handleResponse) => {
         setIsLoading(true);
         setError(null);
         try {
@@ -19,7 +19,7 @@ const useHttp = () => {
             if (!response.ok) {
                 const res = await response.json();
                 // Handling JSON error response
-                console.log('res testing', res.status);
+                setIsLoading(false);
                 return setError(res.message);
             }
 
@@ -30,12 +30,12 @@ const useHttp = () => {
             }
 
             if (resData) {
-                applyData(resData);
+                handleResponse(resData);
             } else {
-                applyData();
+                handleResponse();
             }
         } catch (error) {
-            // The catch block is also run if you attempt to parse JSON
+            // The catch block is also run if you attempt to parse JSON via response.json()
             // while the response we get from the backend is in a different format.
             setError('Something went wrong!');
         }
