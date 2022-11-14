@@ -26,11 +26,18 @@ const JokeControlBar = (props) => {
 
     const confirmDeleteModalHandler = () => {
         setShowDeleteModal(false);
-        props.deleteJoke();
+        props.deleteJokeHandler();
     };
 
     const editButtonHandler = () => {
         navigate(`/${jokesCtx.openJoke._id}/edit`);
+    };
+
+    const randomJokeHandler = () => {
+        const randomIndex = Math.floor(Math.random() * jokesCtx.jokesCount);
+        const randomJoke = jokesCtx.jokes[randomIndex];
+
+        navigate(`/${randomJoke._id}`);
     };
 
     return (
@@ -44,7 +51,7 @@ const JokeControlBar = (props) => {
                 />
             )}
             <div className={classes.controlBar}>
-                <Button onClick={jokesCtx.randomJokeHandler} size="large">
+                <Button onClick={randomJokeHandler} size="large">
                     Random Joke
                 </Button>
                 {authCtx.loggedInUser && (

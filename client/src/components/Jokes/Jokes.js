@@ -17,9 +17,9 @@ const Jokes = (props) => {
         <div className={classes.jokes}>
             <div className={classes.jokesTop}>
                 <div className={classes.navButtonContainer}>
-                    {jokesCtx.openJoke.position > 1 && (
+                    {props.openJoke.position > 1 && (
                         <IconButton
-                            onClick={jokesCtx.prevJokeHandler}
+                            onClick={props.prevJokeHandler}
                             className={classes.navButton}
                         >
                             <FontAwesomeIcon icon={faCaretLeft} />
@@ -27,11 +27,11 @@ const Jokes = (props) => {
                     )}
                 </div>
 
-                <Joke />
+                <Joke openJoke={props.openJoke} />
                 <div className={classes.navButtonContainer}>
-                    {jokesCtx.openJoke.position !== jokesCtx.jokesCount && (
+                    {props.openJoke.position !== jokesCtx.jokesCount && (
                         <IconButton
-                            onClick={jokesCtx.nextJokeHandler}
+                            onClick={props.nextJokeHandler}
                             className={classes.navButton}
                         >
                             <FontAwesomeIcon icon={faCaretRight} />
@@ -41,9 +41,9 @@ const Jokes = (props) => {
             </div>
             <div className={classes.jokesBottom}>
                 <p className={`${classes.jokeCount} text-muted`}>
-                    {jokesCtx.openJoke.position} / {jokesCtx.jokesCount}
+                    {props.openJoke.position} / {jokesCtx.jokesCount}
                 </p>
-                <JokeControlBar deleteJoke={props.deleteJoke} />
+                <JokeControlBar deleteJokeHandler={props.deleteJokeHandler} />
             </div>
         </div>
     );

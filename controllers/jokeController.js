@@ -1,6 +1,7 @@
 const catchAsync = require('../middleware/catchAsync');
 const filterObject = require('../utils/filterObject');
 const Joke = require('../models/jokeModel');
+const AppError = require('../utils/AppError');
 
 exports.getAllJokes = catchAsync(async (req, res, next) => {
     const jokes = await Joke.find();

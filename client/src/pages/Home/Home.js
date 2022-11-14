@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { useEffect, useContext, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import JokesContext from '../../store/jokes-context';
+import useHttp from '../../hooks/useHttp';
 import Jokes from '../../components/Jokes/Jokes';
 import Modal from '../../components/UI/Modal/Modal';
 import PageOffsetContainer from '../../components/UI/PageOffsetContainer/PageOffsetContainer';
@@ -10,68 +10,98 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner/LoadingSpinner';
 import AppMessage from '../../components/UI/AppMessage/AppMessage';
 
 const Home = () => {
-    const [isLoading, setIsLoading] = useState();
-    const [errorOccurred, setErrorOccurred] = useState();
+    const [openJoke, setOpenJoke] = useState(null);
     const jokesCtx = useContext(JokesContext);
     const navigate = useNavigate();
+    const {
+        sendRequest,
+        isLoading: httpLoading,
+        error: httpError,
+        dismissErrorHandler: dismissHttpErrorHandler
+    } = useHttp();
     const { id } = useParams();
 
-    const { openJoke, jokes, loading, openNewJoke, getAllJokesHandler, error } =
-        jokesCtx;
+    const {
+        jokes,
+        jokesError,
+        jokesLoading,
+        getAllJokesHandler,
+        findJokeHelper
+    } = jokesCtx;
 
     useEffect(() => {
-        if (!jokes && !loading && !error) {
+        if (!jokes && !jokesLoading && !jokesError) {
             getAllJokesHandler();
         }
-    }, [jokes, loading, error, getAllJokesHandler]);
+    }, [jokes, jokesLoading, jokesError, getAllJokesHandler]);
 
     useEffect(() => {
         if (jokes) {
             if (id && id !== openJoke?._id) {
-                openNewJoke(id);
+                const joke = findJokeHelper(id);
+                setOpenJoke(joke);
             }
 
-            if (!id && jokes.length > 0) {
+            if (!id && jokes) {
                 navigate(`/${jokes[0]._id}`);
             }
         }
-    }, [openJoke, jokes, id, openNewJoke, navigate]);
+    }, [openJoke, jokes, id, findJokeHelper, navigate]);
 
-    const deleteJoke = async () => {
-        try {
-            setIsLoading(true);
-            await axios.delete(`/api/v1/jokes/${openJoke._id}`);
-            jokesCtx.deleteJokeHandler(openJoke._id);
-            navigate('/');
-            setIsLoading(false);
-        } catch (err) {
-            setIsLoading(false);
-            setErrorOccurred(
-                err.response?.data.message
-                    ? err.response.data.message
-                    : err.message
-            );
-        }
+    const prevJokeHandler = () => {
+        let jokeIndex = jokes.findIndex((joke) => joke._id === openJoke._id);
+
+        navigate(`/${jokes[--jokeIndex]._id}`);
     };
 
-    let errorComponent = null;
+    const nextJokeHandler = () => {
+        let jokeIndex = jokes.findIndex((joke) => joke._id === openJoke._id);
 
-    if (jokesCtx.error)
-        errorComponent = <Modal title="Error" content={jokesCtx.error} />;
+        navigate(`/${jokes[++jokeIndex]._id}`);
+    };
 
-    if (errorOccurred)
-        errorComponent = <Modal title="Error" content={errorOccurred} />;
+    const deleteJokeHandler = async () => {
+        sendRequest(
+            { url: `/api/v1/jokes/${openJoke._id}`, method: 'DELETE' },
+            () => {
+                jokesCtx.deleteJokeHandler(openJoke._id);
+                navigate('/');
+            }
+        );
+    };
+
+    let content = <LoadingSpinner />;
+
+    if (openJoke) {
+        content = (
+            <Jokes
+                prevJokeHandler={prevJokeHandler}
+                nextJokeHandler={nextJokeHandler}
+                openJoke={openJoke}
+                deleteJokeHandler={deleteJokeHandler}
+            />
+        );
+    }
+
+    if (jokes?.length === 0 && !jokesLoading)
+        content = (
+            <AppMessage message="No jokes found. Contact the admin of the site." />
+        );
+
+    if (jokesError) content = <Modal title="Error" content={jokesError} />;
+
+    if (httpLoading) content = <LoadingSpinner />;
 
     return (
         <PageOffsetContainer>
-            {errorComponent}
-            {(jokesCtx.loading || isLoading) && <LoadingSpinner />}
-            {jokesCtx.openJoke && !jokesCtx.error && !isLoading && (
-                <Jokes deleteJoke={deleteJoke} />
+            {httpError && (
+                <Modal
+                    title="Error"
+                    content={httpError}
+                    dismissModalHandler={dismissHttpErrorHandler}
+                />
             )}
-            {!loading && jokes && jokes.length === 0 && !error && (
-                <AppMessage message="No jokes found. Contact the (lazy-ass) admin of the site." />
-            )}
+            {content}
         </PageOffsetContainer>
     );
 };
