@@ -29,10 +29,6 @@ const JokeControlBar = (props) => {
         props.deleteJokeHandler();
     };
 
-    const editButtonHandler = () => {
-        navigate(`/${jokesCtx.openJoke._id}/edit`);
-    };
-
     const randomJokeHandler = () => {
         const randomIndex = Math.floor(Math.random() * jokesCtx.jokesCount);
         const randomJoke = jokesCtx.jokes[randomIndex];
@@ -56,7 +52,7 @@ const JokeControlBar = (props) => {
                 </Button>
                 {authCtx.loggedInUser && (
                     <>
-                        <Button size="large" onClick={editButtonHandler}>
+                        <Button size="large" onClick={props.editJokeHandler}>
                             Edit
                         </Button>
                         <Button size="large" onClick={deleteButtonHandler}>

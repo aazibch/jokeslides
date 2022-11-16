@@ -11,6 +11,7 @@ import AppMessage from '../../components/UI/AppMessage/AppMessage';
 
 const Home = () => {
     const [openJoke, setOpenJoke] = useState(null);
+    const [noPageError, setNoPageError] = useState(null);
     const jokesCtx = useContext(JokesContext);
     const navigate = useNavigate();
     const {
@@ -39,6 +40,13 @@ const Home = () => {
         if (jokes) {
             if (id && id !== openJoke?._id) {
                 const joke = findJokeHelper(id);
+
+                if (!joke) {
+                    return setNoPageError(
+                        'The page you are looking for does not exist.'
+                    );
+                }
+
                 setOpenJoke(joke);
             }
 
@@ -70,11 +78,16 @@ const Home = () => {
         );
     };
 
+    const editJokeHandler = () => {
+        navigate(`/${openJoke._id}/edit`);
+    };
+
     let content = <LoadingSpinner />;
 
     if (openJoke) {
         content = (
             <Jokes
+                editJokeHandler={editJokeHandler}
                 prevJokeHandler={prevJokeHandler}
                 nextJokeHandler={nextJokeHandler}
                 openJoke={openJoke}
@@ -89,6 +102,8 @@ const Home = () => {
         );
 
     if (jokesError) content = <Modal title="Error" content={jokesError} />;
+
+    if (noPageError) content = <Modal title="Error" content={noPageError} />;
 
     if (httpLoading) content = <LoadingSpinner />;
 

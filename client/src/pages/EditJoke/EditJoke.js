@@ -1,7 +1,7 @@
-import axios from 'axios';
 import { useEffect, useContext, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import useHttp from '../../hooks/useHttp';
 import PageOffsetContainer from '../../components/UI/PageOffsetContainer/PageOffsetContainer';
 import LoadingSpinner from '../../components/UI/LoadingSpinner/LoadingSpinner';
 import CreateEditJokeForm from '../../components/Jokes/CreateEditJokeForm/CreateEditJokeForm';
@@ -13,19 +13,22 @@ const EditPage = () => {
     const [jokeId, setJokeId] = useState('');
     const [jokeContent, setJokeContent] = useState('');
     const [jokeSource, setJokeSource] = useState('');
-    const [isLoading, setIsLoading] = useState(null);
-    const [errorOccurred, setErrorOccurred] = useState(null);
+    const [noPageError, setNoPageError] = useState(null);
 
     const navigate = useNavigate();
+    const {
+        sendRequest,
+        isLoading: httpLoading,
+        error: httpError,
+        dismissErrorHandler: dismissHttpErrorHandler
+    } = useHttp();
 
     const jokesCtx = useContext(JokesContext);
     const {
-        openJoke,
         jokes,
-        loading,
-        error,
+        jokesLoading,
+        jokesError,
         getAllJokesHandler,
-        openNewJoke,
         findJokeHelper
     } = jokesCtx;
     const { id } = useParams();
@@ -34,10 +37,10 @@ const EditPage = () => {
         // Get jokes if not there already
         // Necessary to fetch the details for the joke editing
         // For all the jokes are fetched together.
-        if (!jokes && !loading && !error) {
+        if (!jokes && !jokesLoading && !jokesError) {
             getAllJokesHandler();
         }
-    }, [jokes, loading, error, getAllJokesHandler]);
+    }, [jokes, jokesLoading, jokesError, getAllJokesHandler]);
 
     useEffect(() => {
         // If jokes have been loaded,
@@ -54,14 +57,13 @@ const EditPage = () => {
                     setJokeContent(jokeToEdit.content);
                     setJokeSource(jokeToEdit.source);
                 } else {
-                    setErrorOccurred({
-                        message: 'The page you are looking for does not exist.',
-                        dismissable: false
-                    });
+                    setNoPageError(
+                        'The page you are looking for does not exist.'
+                    );
                 }
             }
         }
-    }, [openJoke, jokes, id, jokeId, openNewJoke, findJokeHelper]);
+    }, [jokes, id, jokeId, findJokeHelper]);
 
     const jokeContentChangeHandler = (event) => {
         setJokeContent(event.target.value);
@@ -71,59 +73,60 @@ const EditPage = () => {
         setJokeSource(event.target.value);
     };
 
-    const dismissErrorModalHandler = () => {
-        setErrorOccurred(null);
-    };
-
     const submitFormHandler = async (event) => {
         event.preventDefault();
-        try {
-            setIsLoading(true);
-            const response = await axios.patch(`/api/v1/jokes/${jokeId}`, {
+
+        const requestConfig = {
+            url: `/api/v1/jokes/${jokeId}`,
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: {
                 content: jokeContent,
                 source: jokeSource
-            });
-            jokesCtx.editJokeHandler(response.data.data);
-            setIsLoading(false);
-            navigate(`/${response.data.data._id}`);
-        } catch (err) {
-            setIsLoading(false);
-            setErrorOccurred({
-                message: err.response?.data.message
-                    ? err.response.data.message
-                    : err.message,
-                dismissable: true
-            });
-        }
+            }
+        };
+
+        const handleResponseCallback = (response) => {
+            jokesCtx.editJokeHandler(response.data);
+            navigate(`/${response.data._id}`);
+        };
+
+        sendRequest(requestConfig, handleResponseCallback);
     };
 
-    let content = (
-        <CreateEditJokeForm
-            submitFormHandler={submitFormHandler}
-            heading="Edit Joke"
-            jokeInput={jokeContent}
-            sourceInput={jokeSource}
-            jokeChangeHandler={jokeContentChangeHandler}
-            sourceChangeHandler={jokeSourceChangeHandler}
-        />
-    );
+    let content = <LoadingSpinner />;
 
-    if (loading || isLoading) content = <LoadingSpinner />;
+    if (jokesError) content = <Modal title="Error" content={jokesError} />;
 
-    if (errorOccurred)
+    if (noPageError) content = <Modal title="Error" content={noPageError} />;
+
+    if (jokeId) {
         content = (
-            <Modal
-                title="Error"
-                content={errorOccurred.message}
-                dismissModalHandler={
-                    errorOccurred.dismissable ? dismissErrorModalHandler : null
-                }
+            <CreateEditJokeForm
+                submitFormHandler={submitFormHandler}
+                heading="Edit Joke"
+                jokeInput={jokeContent}
+                sourceInput={jokeSource}
+                jokeChangeHandler={jokeContentChangeHandler}
+                sourceChangeHandler={jokeSourceChangeHandler}
             />
         );
+    }
 
-    if (error) content = <Modal title="Error" content={error} />;
+    if (httpLoading) content = <LoadingSpinner />;
 
-    return <PageOffsetContainer>{content}</PageOffsetContainer>;
+    return (
+        <PageOffsetContainer>
+            {httpError && (
+                <Modal
+                    title="Error"
+                    content={httpError}
+                    dismissModalHandler={dismissHttpErrorHandler}
+                />
+            )}
+            {content}
+        </PageOffsetContainer>
+    );
 };
 
 export default EditPage;

@@ -1,6 +1,7 @@
-import axios from 'axios';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import useHttp from '../../hooks/useHttp';
 import LoadingSpinner from '../../components/UI/LoadingSpinner/LoadingSpinner';
 import Modal from '../../components/UI/Modal/Modal';
 import PageOffsetContainer from '../../components/UI/PageOffsetContainer/PageOffsetContainer';
@@ -8,33 +9,29 @@ import PageOffsetContainer from '../../components/UI/PageOffsetContainer/PageOff
 import AuthContext from '../../store/auth-context';
 
 const Logout = () => {
-    const [error, setError] = useState(null);
     const authCtx = useContext(AuthContext);
     const navigate = useNavigate();
+
+    const { sendRequest, error } = useHttp();
 
     const { logoutHandler } = authCtx;
 
     useEffect(() => {
         const logout = async () => {
-            try {
-                await axios.get('/api/v1/users/logout/');
+            sendRequest({ url: '/api/v1/users/logout' }, () => {
                 logoutHandler();
                 navigate('/');
-            } catch (err) {
-                setError(
-                    err.response?.data.message
-                        ? err.response.data.message
-                        : err.message
-                );
-            }
+            });
         };
 
         logout();
-    }, [logoutHandler, navigate]);
+    }, [sendRequest, logoutHandler, navigate]);
 
     const errorModalCloseHandler = () => {
         navigate('/');
     };
+
+    console.log('error', error);
 
     if (error)
         return (

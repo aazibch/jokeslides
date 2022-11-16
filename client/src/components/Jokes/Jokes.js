@@ -43,7 +43,10 @@ const Jokes = (props) => {
                 <p className={`${classes.jokeCount} text-muted`}>
                     {props.openJoke.position} / {jokesCtx.jokesCount}
                 </p>
-                <JokeControlBar deleteJokeHandler={props.deleteJokeHandler} />
+                <JokeControlBar
+                    editJokeHandler={props.editJokeHandler}
+                    deleteJokeHandler={props.deleteJokeHandler}
+                />
             </div>
         </div>
     );
