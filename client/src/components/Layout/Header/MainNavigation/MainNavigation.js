@@ -13,8 +13,8 @@ const MainNavigation = () => {
 
         if (
             navData.isActive &&
-            !jokesCtx.loading &&
-            !jokesCtx.error &&
+            !jokesCtx.jokesLoading &&
+            !jokesCtx.jokesError &&
             splitPathname.length < 3 &&
             splitPathname[1] !== 'create-new-joke'
         ) {
@@ -34,6 +34,7 @@ const MainNavigation = () => {
                 className={(navData) =>
                     navData.isActive ? classes.active : ''
                 }
+                end
             >
                 Create New Joke
             </NavLink>
