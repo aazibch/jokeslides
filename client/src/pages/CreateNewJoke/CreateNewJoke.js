@@ -1,5 +1,7 @@
 import { useContext, useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+import useHttp from '../../hooks/useHttp';
 import CreateEditJokeForm from '../../components/Jokes/CreateEditJokeForm/CreateEditJokeForm';
 import LoadingSpinner from '../../components/UI/LoadingSpinner/LoadingSpinner';
 import Modal from '../../components/UI/Modal/Modal';
@@ -9,32 +11,30 @@ import JokesContext from '../../store/jokes-context';
 const CreateNewJoke = () => {
     const [jokeInput, setJokeInput] = useState('');
     const [sourceInput, setSourceInput] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
 
+    const { isLoading, error, dismissErrorHandler, sendRequest } = useHttp();
+    const navigate = useNavigate();
     const jokesCtx = useContext(JokesContext);
 
     const submitFormHandler = async (event) => {
         event.preventDefault();
 
-        try {
-            setLoading(true);
-            const response = await axios.post('/api/v1/jokes/', {
+        const requestConfig = {
+            url: '/api/v1/jokes/',
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: {
                 content: jokeInput,
                 source: sourceInput
-            });
+            }
+        };
 
-            jokesCtx.newJokeHandler(response.data.data);
+        const handleResponseCallback = (response) => {
+            jokesCtx.newJokeHandler(response.data);
+            navigate(`/${response.data._id}`);
+        };
 
-            setLoading(false);
-        } catch (err) {
-            setLoading(false);
-            setError(
-                err.response?.data.message
-                    ? err.response.data.message
-                    : err.message
-            );
-        }
+        sendRequest(requestConfig, handleResponseCallback);
     };
 
     const jokeChangeHandler = (event) => {
@@ -45,9 +45,18 @@ const CreateNewJoke = () => {
         setSourceInput(event.target.value);
     };
 
-    const dismissErrorModalHandler = () => {
-        setError(null);
-    };
+    let content = (
+        <CreateEditJokeForm
+            heading="Create New Joke"
+            jokeInput={jokeInput}
+            sourceInput={sourceInput}
+            jokeChangeHandler={jokeChangeHandler}
+            sourceChangeHandler={sourceChangeHandler}
+            submitFormHandler={submitFormHandler}
+        />
+    );
+
+    if (isLoading) content = <LoadingSpinner />;
 
     return (
         <PageOffsetContainer>
@@ -55,26 +64,12 @@ const CreateNewJoke = () => {
                 <Modal
                     title="Error"
                     content={error}
-                    dismissModalHandler={dismissErrorModalHandler}
+                    dismissModalHandler={dismissErrorHandler}
                 />
             )}
-            {loading ? (
-                <LoadingSpinner />
-            ) : (
-                <CreateEditJokeForm
-                    heading="Create New Joke"
-                    jokeInput={jokeInput}
-                    sourceInput={sourceInput}
-                    jokeChangeHandler={jokeChangeHandler}
-                    sourceChangeHandler={sourceChangeHandler}
-                    submitFormHandler={submitFormHandler}
-                />
-            )}
+            {content}
         </PageOffsetContainer>
     );
 };
-
-//@todo
-// Add handler to cancel error model.
 
 export default CreateNewJoke;

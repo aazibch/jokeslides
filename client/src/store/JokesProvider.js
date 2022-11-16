@@ -1,5 +1,4 @@
 import { useReducer, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import JokesContext from './jokes-context';
 import useHttp from '../hooks/useHttp';
@@ -91,8 +90,6 @@ export const JokesProvider = (props) => {
         sendRequest
     } = useHttp();
 
-    const navigate = useNavigate();
-
     const getAllJokesHandler = useCallback(async () => {
         sendRequest({ url: '/api/v1/jokes' }, (data) => {
             dispatchJokesAction({
@@ -102,29 +99,8 @@ export const JokesProvider = (props) => {
         });
     }, [sendRequest]);
 
-    const openNewJoke = useCallback(
-        (jokeId) => {
-            const joke = jokesState.jokes.find((joke) => joke._id === jokeId);
-
-            if (joke) {
-                dispatchJokesAction({
-                    type: 'SET_OPEN_JOKE',
-                    openJoke: { ...joke }
-                });
-            } else {
-                dispatchJokesAction({
-                    type: 'SET_ERROR',
-                    error: 'The page you are looking for does not exist.'
-                });
-            }
-        },
-        [jokesState.jokes]
-    );
-
     const newJokeHandler = (data) => {
         dispatchJokesAction({ type: 'ADD_NEW_JOKE', newJoke: data });
-
-        navigate(`/${data._id}`);
     };
 
     const editJokeHandler = (data) => {
