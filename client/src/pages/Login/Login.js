@@ -26,17 +26,12 @@ const Login = () => {
         setPasswordInput(event.target.value);
     };
 
-    const submitFormHandler = async (event) => {
-        event.preventDefault();
-
+    const submitFormHandler = async (data) => {
         const requestConfig = {
             url: '/api/v1/users/login/',
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: {
-                email: emailInput,
-                password: passwordInput
-            }
+            body: data
         };
 
         const handleResponseCallback = (response) => {

@@ -31,8 +31,6 @@ const Logout = () => {
         navigate('/');
     };
 
-    console.log('error', error);
-
     if (error)
         return (
             <Modal

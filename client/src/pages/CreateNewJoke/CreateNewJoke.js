@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useHttp from '../../hooks/useHttp';
@@ -7,25 +7,21 @@ import LoadingSpinner from '../../components/UI/LoadingSpinner/LoadingSpinner';
 import Modal from '../../components/UI/Modal/Modal';
 import PageOffsetContainer from '../../components/UI/PageOffsetContainer/PageOffsetContainer';
 import JokesContext from '../../store/jokes-context';
+import { createJokeForm } from '../../utils/forms/formConfigs';
 
 const CreateNewJoke = () => {
-    const [jokeInput, setJokeInput] = useState('');
-    const [sourceInput, setSourceInput] = useState('');
-
     const { isLoading, error, dismissErrorHandler, sendRequest } = useHttp();
     const navigate = useNavigate();
     const jokesCtx = useContext(JokesContext);
 
-    const submitFormHandler = async (event) => {
-        event.preventDefault();
-
+    const submitFormHandler = async (data) => {
         const requestConfig = {
             url: '/api/v1/jokes/',
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: {
-                content: jokeInput,
-                source: sourceInput
+                content: data.joke,
+                source: data.source
             }
         };
 
@@ -37,21 +33,10 @@ const CreateNewJoke = () => {
         sendRequest(requestConfig, handleResponseCallback);
     };
 
-    const jokeChangeHandler = (event) => {
-        setJokeInput(event.target.value);
-    };
-
-    const sourceChangeHandler = (event) => {
-        setSourceInput(event.target.value);
-    };
-
     let content = (
         <CreateEditJokeForm
             heading="Create New Joke"
-            jokeInput={jokeInput}
-            sourceInput={sourceInput}
-            jokeChangeHandler={jokeChangeHandler}
-            sourceChangeHandler={sourceChangeHandler}
+            formConfig={createJokeForm()}
             submitFormHandler={submitFormHandler}
         />
     );

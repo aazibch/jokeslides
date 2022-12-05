@@ -1,29 +1,29 @@
 import Button from '../../UI/Button/Button';
 import Card from '../../UI/Card/Card';
-import Input from '../../UI/Input/Input';
+import useForm from '../../../hooks/useForm';
 
 import classes from './CreateEditJokeForm.module.css';
 
 const CreateEditJokeForm = (props) => {
+    const { createFormInputs, isFormValid, getFormValues } = useForm(
+        props.formConfig
+    );
+
+    const onSubmit = (event) => {
+        event.preventDefault();
+
+        if (!isFormValid(true)) {
+            return;
+        }
+
+        props.submitFormHandler(getFormValues());
+    };
+
     return (
         <Card className={classes.createEditJokeForm}>
-            <form onSubmit={props.submitFormHandler}>
+            <form onSubmit={onSubmit}>
                 <h2>{props.heading}</h2>
-                <Input
-                    id="joke"
-                    className={classes.jokeInput}
-                    value={props.jokeInput}
-                    label="Joke"
-                    type="textarea"
-                    onChange={props.jokeChangeHandler}
-                />
-                <Input
-                    id="source"
-                    label="Source"
-                    type="text"
-                    value={props.sourceInput}
-                    onChange={props.sourceChangeHandler}
-                />
+                {createFormInputs()}
                 <Button className={classes.createButton}>Create</Button>
             </form>
         </Card>

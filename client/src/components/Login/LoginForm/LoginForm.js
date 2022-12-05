@@ -1,28 +1,34 @@
+import useForm from '../../../hooks/useForm';
+import { loginForm } from '../../../utils/forms/formConfigs';
 import Card from '../../UI/Card/Card';
-import Input from '../../UI/Input/Input';
 import Button from '../../UI/Button/Button';
 
 import classes from './LoginForm.module.css';
 
 const LoginForm = (props) => {
+    const {
+        createFormInputs,
+        isFormValid,
+        getFormValues,
+        updateFormFieldsToTouched
+    } = useForm(loginForm);
+
+    const onSubmit = (event) => {
+        event.preventDefault();
+        updateFormFieldsToTouched();
+
+        if (!isFormValid()) {
+            return;
+        }
+
+        props.submitFormHandler(getFormValues());
+    };
+
     return (
         <Card className={classes.loginForm}>
-            <form onSubmit={props.submitFormHandler}>
+            <form onSubmit={onSubmit}>
                 <h2>Login</h2>
-                <Input
-                    id="email"
-                    label="Email"
-                    type="email"
-                    value={props.emailInput}
-                    onChange={props.emailChangeHandler}
-                />
-                <Input
-                    id="password"
-                    label="Password"
-                    type="password"
-                    value={props.passwordInput}
-                    onChange={props.passwordChangeHandler}
-                />
+                {createFormInputs()}
                 <Button className={classes.loginButton}>Login</Button>
             </form>
         </Card>

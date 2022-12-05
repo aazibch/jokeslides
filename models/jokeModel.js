@@ -4,7 +4,7 @@ const AppError = require('../utils/AppError');
 const jokeSchema = new mongoose.Schema({
     content: {
         type: String,
-        required: [true, 'The joke content is required.'],
+        required: [true, 'Joke is required.'],
         unique: true
     },
     source: {

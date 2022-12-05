@@ -28,3 +28,8 @@
 .control textarea:focus {
     outline: none;
 }
+
+.error {
+    color: red;
+    margin: 0.5rem 0;
+}

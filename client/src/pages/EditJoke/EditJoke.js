@@ -1,5 +1,6 @@
 import { useEffect, useContext, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { createJokeForm } from '../../utils/forms/formConfigs';
 
 import useHttp from '../../hooks/useHttp';
 import PageOffsetContainer from '../../components/UI/PageOffsetContainer/PageOffsetContainer';
@@ -10,9 +11,8 @@ import Modal from '../../components/UI/Modal/Modal';
 import JokesContext from '../../store/jokes-context';
 
 const EditPage = () => {
+    const [editFormConfig, setEditFormConfig] = useState();
     const [jokeId, setJokeId] = useState('');
-    const [jokeContent, setJokeContent] = useState('');
-    const [jokeSource, setJokeSource] = useState('');
     const [noPageError, setNoPageError] = useState(null);
 
     const navigate = useNavigate();
@@ -53,9 +53,10 @@ const EditPage = () => {
                 // If joke found, meaning the id given in the url was accurate
                 // Add the joke to state
                 if (jokeToEdit) {
+                    setEditFormConfig(
+                        createJokeForm(jokeToEdit.content, jokeToEdit.source)
+                    );
                     setJokeId(jokeToEdit._id);
-                    setJokeContent(jokeToEdit.content);
-                    setJokeSource(jokeToEdit.source);
                 } else {
                     setNoPageError(
                         'The page you are looking for does not exist.'
@@ -65,24 +66,14 @@ const EditPage = () => {
         }
     }, [jokes, id, jokeId, findJokeHelper]);
 
-    const jokeContentChangeHandler = (event) => {
-        setJokeContent(event.target.value);
-    };
-
-    const jokeSourceChangeHandler = (event) => {
-        setJokeSource(event.target.value);
-    };
-
-    const submitFormHandler = async (event) => {
-        event.preventDefault();
-
+    const submitFormHandler = (data) => {
         const requestConfig = {
             url: `/api/v1/jokes/${jokeId}`,
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: {
-                content: jokeContent,
-                source: jokeSource
+                content: data.joke,
+                source: data.source
             }
         };
 
@@ -103,12 +94,9 @@ const EditPage = () => {
     if (jokeId) {
         content = (
             <CreateEditJokeForm
+                formConfig={editFormConfig}
                 submitFormHandler={submitFormHandler}
                 heading="Edit Joke"
-                jokeInput={jokeContent}
-                sourceInput={jokeSource}
-                jokeChangeHandler={jokeContentChangeHandler}
-                sourceChangeHandler={jokeSourceChangeHandler}
             />
         );
     }
