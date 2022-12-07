@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
 const useForm = (formObj) => {
     const [form, setForm] = useState(formObj);
@@ -15,53 +15,44 @@ const useForm = (formObj) => {
         });
     };
 
-    const updateFieldValidityState = useCallback(
-        (inputField) => {
-            for (const rule of inputField.validationRules) {
-                if (!rule.validate(inputField.value, form)) {
-                    inputField.valid = false;
-                    inputField.error = inputField.touched
-                        ? rule.errorMessage
-                        : null;
-                    return inputField;
-                }
+    const updateFieldValidityState = (inputField) => {
+        for (const rule of inputField.validationRules) {
+            if (!rule.validate(inputField.value, form)) {
+                inputField.valid = false;
+                inputField.error = inputField.touched
+                    ? rule.errorMessage
+                    : null;
+                return inputField;
             }
+        }
 
-            inputField.valid = true;
-            inputField.error = null;
-            return inputField;
-        },
-        [form]
-    );
+        inputField.valid = true;
+        inputField.error = null;
+        return inputField;
+    };
 
-    const inputBlurHandler = useCallback(
-        (event) => {
-            let inputObj = { ...form[event.target.id] };
-            inputObj.touched = true;
+    const inputBlurHandler = (event) => {
+        let inputObj = { ...form[event.target.id] };
+        inputObj.touched = true;
 
-            // Update validity state
-            inputObj = updateFieldValidityState(inputObj);
+        // Update validity state
+        inputObj = updateFieldValidityState(inputObj);
 
-            setForm({ ...form, [event.target.id]: inputObj });
-        },
-        [form, updateFieldValidityState]
-    );
+        setForm({ ...form, [event.target.id]: inputObj });
+    };
 
-    const inputChangeHandler = useCallback(
-        (event) => {
-            let inputObj = { ...form[event.target.id] };
+    const inputChangeHandler = (event) => {
+        let inputObj = { ...form[event.target.id] };
 
-            // Update value
-            inputObj.value = event.target.value;
+        // Update value
+        inputObj.value = event.target.value;
 
-            // Update validity state
+        // Update validity state
 
-            inputObj = updateFieldValidityState(inputObj);
+        inputObj = updateFieldValidityState(inputObj);
 
-            setForm({ ...form, [event.target.id]: inputObj });
-        },
-        [form, updateFieldValidityState]
-    );
+        setForm({ ...form, [event.target.id]: inputObj });
+    };
 
     const getFormValues = () => {
         const formFieldNames = Object.keys(form);
@@ -74,32 +65,29 @@ const useForm = (formObj) => {
         return formValues;
     };
 
-    const isFormValid = useCallback(
-        (showErrorMessages = false) => {
-            const inputs = Object.values(form);
+    const isFormValid = (showErrorMessages = false) => {
+        const inputs = Object.values(form);
 
-            if (showErrorMessages) {
-                const updatedForm = { ...form };
+        if (showErrorMessages) {
+            const updatedForm = { ...form };
 
-                const inputs = Object.keys(form);
+            const inputs = Object.keys(form);
 
-                // when touched property is true, field error message is shown.
-                inputs.forEach((inputName) => {
-                    const updatedField = {
-                        ...updatedForm[inputName],
-                        touched: true
-                    };
+            // when touched property is true, field error message is shown.
+            inputs.forEach((inputName) => {
+                const updatedField = {
+                    ...updatedForm[inputName],
+                    touched: true
+                };
 
-                    updatedForm[inputName] = updatedField;
-                });
+                updatedForm[inputName] = updatedField;
+            });
 
-                setForm(updatedForm);
-            }
+            setForm(updatedForm);
+        }
 
-            return inputs.every((input) => input.valid === true);
-        },
-        [form]
-    );
+        return inputs.every((input) => input.valid === true);
+    };
 
     return {
         createFormInputs,

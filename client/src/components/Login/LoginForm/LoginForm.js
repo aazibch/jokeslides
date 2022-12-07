@@ -6,18 +6,12 @@ import Button from '../../UI/Button/Button';
 import classes from './LoginForm.module.css';
 
 const LoginForm = (props) => {
-    const {
-        createFormInputs,
-        isFormValid,
-        getFormValues,
-        updateFormFieldsToTouched
-    } = useForm(loginForm);
+    const { createFormInputs, isFormValid, getFormValues } = useForm(loginForm);
 
     const onSubmit = (event) => {
         event.preventDefault();
-        updateFormFieldsToTouched();
 
-        if (!isFormValid()) {
+        if (!isFormValid(true)) {
             return;
         }
 
