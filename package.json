@@ -22,5 +22,6 @@
         "morgan": "^1.10.0",
         "react-router-dom": "^6.4.2",
         "validator": "^13.7.0"
-    }
+    },
+    "engines": { "node": "16.x" }
 }
