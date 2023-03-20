@@ -1,6 +1,6 @@
 # JokeSlides
 
-A full-stack app that allows users to browse jokes.
+A full-stack app that allows users to browse jokes. It comes with an admin control panel.
 
 Built in tribute to Norm Macdonald.
 
