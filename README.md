@@ -6,7 +6,7 @@ Built in tribute to Norm Macdonald.
 
 # Demo
 
-The demo can be accessed at https://jokeslides.up.railway.app/
+The demo can be accessed at https://jokeslides.onrender.com/.
 
 ## Details
 
