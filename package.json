@@ -1,30 +1,31 @@
 {
-    "name": "jokeslides",
-    "version": "1.0.0",
-    "description": "Browse your favorite jokes.",
-    "main": "index.js",
-    "scripts": {
-        "start": "node index.js",
-        "start:dev": "nodemon index.js",
-        "build-client": "cd client && npm run build",
-        "install-client": "cd client && npm install",
-        "build": "npm run install-client && npm run build-client",
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "Aazib Chaudhry",
-    "license": "ISC",
-    "dependencies": {
-        "bcrypt": "^5.1.0",
-        "cookie-parser": "^1.4.6",
-        "dotenv": "^16.0.3",
-        "express": "^4.18.2",
-        "jsonwebtoken": "^8.5.1",
-        "mongoose": "^6.6.5",
-        "morgan": "^1.10.0",
-        "react-router-dom": "^6.4.2",
-        "validator": "^13.7.0"
-    },
-    "engines": {
-        "node": "16.x"
-    }
+  "name": "jokeslides",
+  "version": "1.0.0",
+  "description": "Browse your favorite jokes.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:dev": "nodemon index.js",
+    "build-client": "cd client && npm run build",
+    "install-client": "cd client && npm install",
+    "install-server": "npm install",
+    "build": "npm run install-server && npm run install-client && npm run build-client",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aazib Chaudhry",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.6.5",
+    "morgan": "^1.10.0",
+    "react-router-dom": "^6.4.2",
+    "validator": "^13.7.0"
+  },
+  "engines": {
+    "node": "16.x"
+  }
 }
