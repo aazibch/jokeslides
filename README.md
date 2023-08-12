@@ -8,6 +8,11 @@ Built in tribute to Norm Macdonald.
 
 The demo can be accessed at https://jokeslides.onrender.com/.
 
+You can log into the admin panel by going to https://jokeslides.onrender.com/login and entering the following credentials:
+
+**Email**: jackson@domain.com  
+**Password**: demopassword123
+
 ## Details
 
 This application has an admin UI through which one can add, edit, or delete jokes.

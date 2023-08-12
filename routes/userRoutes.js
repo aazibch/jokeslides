@@ -9,9 +9,9 @@ router.post('/login', authController.login);
 router.get('/logout', authController.logout);
 
 router.get(
-    '/current',
-    authController.checkUserIsLoggedIn,
-    authController.getLoggedInUser
+  '/current',
+  authController.checkUserIsLoggedIn,
+  authController.getLoggedInUser
 );
 
 module.exports = router;
